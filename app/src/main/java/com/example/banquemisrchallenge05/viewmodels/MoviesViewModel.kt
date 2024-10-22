@@ -1,6 +1,7 @@
 package com.example.banquemisrchallenge05.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.repository.IRepository
@@ -17,13 +18,29 @@ class MoviesViewModel(private val repository: IRepository) : ViewModel() {
 
     private val _nowPlayingMovies = MutableStateFlow<MovieApiState>(MovieApiState.Loading)
     val nowPlayingMovies: StateFlow<MovieApiState> = _nowPlayingMovies // Change var to val
+
     ////
     fun getNowPlayingMovies(page: Int) {
         viewModelScope.launch {
             repository.getNowPlayingMovies(page)
                 .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies) }
+                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies.results) } // pass here only the movies
         }
     }
+
+}
+
+
+// create the viewModel Factory
+
+class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+            return MoviesViewModel(repo) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+
+    }
+
 
 }

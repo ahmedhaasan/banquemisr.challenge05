@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface IRemoteDataSource {
 
-    suspend fun getNowPlayingMovies(page: Int): Flow<List<Movie>>
+    suspend fun getNowPlayingMovies(page: Int): Flow<MovieResponse>
 }

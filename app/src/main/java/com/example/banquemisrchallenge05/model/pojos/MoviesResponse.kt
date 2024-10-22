@@ -1,5 +1,7 @@
 package com.example.banquemisrchallenge05.model.pojos
 
+import java.io.Serializable
+
 
 /**
  *      creating a movieResponse to catch the movies
@@ -18,4 +20,4 @@ data class  Movie(
     val overview:String,
     val poster_path:String,
     val genre_ids:List<Int>
-)
+): Serializable

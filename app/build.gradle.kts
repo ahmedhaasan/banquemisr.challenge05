@@ -83,5 +83,7 @@ dependencies {
 
     // navigatio;n
     implementation("androidx.navigation:navigation-compose:2.8.2")
+    // Coil for image loading
+    implementation("io.coil-kt:coil-compose:2.0.0")
 
 }
