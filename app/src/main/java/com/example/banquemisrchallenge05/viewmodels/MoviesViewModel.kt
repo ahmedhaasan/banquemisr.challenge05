@@ -21,8 +21,8 @@ class MoviesViewModel(private val repository: IRepository) : ViewModel() {
     fun getNowPlayingMovies(page: Int) {
         viewModelScope.launch {
             repository.getNowPlayingMovies(page)
-                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) } // Update _nowPlayingMovies here
-                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies) } // Same here
+                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
+                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies) }
         }
     }
 
