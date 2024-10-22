@@ -86,4 +86,8 @@ dependencies {
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.0.0")
 
+    //
+    implementation ("androidx.compose.animation:animation:1.7.4")
+
+
 }

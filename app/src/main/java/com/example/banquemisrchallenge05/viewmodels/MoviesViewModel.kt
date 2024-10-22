@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.banquemisrchallenge05.model.apistates.MovieApiState
+import com.example.banquemisrchallenge05.model.apistates.MovieDetailsApiState
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,28 +20,65 @@ class MoviesViewModel(private val repository: IRepository) : ViewModel() {
     private val _nowPlayingMovies = MutableStateFlow<MovieApiState>(MovieApiState.Loading)
     val nowPlayingMovies: StateFlow<MovieApiState> = _nowPlayingMovies // Change var to val
 
+    // for movie details
+    private val _movieDetails = MutableStateFlow<MovieDetailsApiState>(MovieDetailsApiState.Loading)
+    val movieDetails: StateFlow<MovieDetailsApiState> = _movieDetails
     ////
     fun getNowPlayingMovies(page: Int) {
         viewModelScope.launch {
             repository.getNowPlayingMovies(page)
                 .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies.results) } // pass here only the movies
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                } // pass here only the movies
         }
     }
 
-}
+    // get popular movies
+    fun getPopularMovies(page: Int) {
+        viewModelScope.launch {
+            repository.getPopularMovies(page)
+                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                }
+        }
+    }
+
+
+    // get popular movies
+    fun getUpcomingMovies(page: Int) {
+        viewModelScope.launch {
+            repository.getUpcomingMovies(page)
+                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                }
+        }
+    }
+
+    // get Movie Details
+    fun getMovieDetailsById(movieId: Int) {
+        viewModelScope.launch {
+
+            repository.getMovieDetailsById(movieId)
+                .catch { error -> _movieDetails.value = MovieDetailsApiState.Failure(error) }
+                .collect { movieDetails -> _movieDetails.value = MovieDetailsApiState.Success(movieDetails) }
+        }
+    }
+
 
 
 // create the viewModel Factory
+}
+    class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+                return MoviesViewModel(repo) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
 
-class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
-            return MoviesViewModel(repo) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+
 
     }
-
-
-}
