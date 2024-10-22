@@ -2,14 +2,22 @@ package com.example.banquemisrchallenge05.ui.theme.screens
 
 import android.util.Log
 import android.webkit.WebSettings
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,12 +32,19 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +56,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
@@ -53,9 +70,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.example.banquemisrchallenge05.NOW_PLAYING
+import com.example.banquemisrchallenge05.POPULAR
+import com.example.banquemisrchallenge05.UPCOMING
 import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.lazy.items
+import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
+import com.google.gson.Gson
 
 @Composable
 fun HomeScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
@@ -63,29 +93,166 @@ fun HomeScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
     Scaffold(
         containerColor = Color.White,
     ) { innerPadding ->
-        HomeContent(moviesViewModel, innerPadding)
+        HomeContent(moviesViewModel, navController, innerPadding)
 
     }
 }
 
 @Composable
-fun HomeContent(moviesViewModel: MoviesViewModel, innerPadding: PaddingValues) {
-    Box(
+fun HomeContent(
+    moviesViewModel: MoviesViewModel,
+    navController: NavController,
+    innerPadding: PaddingValues
+) {
+    Column(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()
 
     ) {
-
-        fetchMovies(moviesViewModel)
+        MovieChips(moviesViewModel)
+        Spacer(modifier = Modifier.height(30.dp))
+        fetchMovies(moviesViewModel, navController)
     }
 }
 
 
+//
+sealed class MovieCategory(val title: String, val icon: ImageVector) {
+    object NowPlaying : MovieCategory("Now Playing", Icons.Filled.PlayArrow)
+    object Popular : MovieCategory("Popular", Icons.Filled.Favorite)
+    object Upcoming : MovieCategory("Upcoming", Icons.Filled.DateRange)
+}
 
+val movieCategories = listOf(
+    MovieCategory.NowPlaying,
+    MovieCategory.Popular,
+    MovieCategory.Upcoming
+)
+
+//
+@Composable
+fun MovieChips(moviesViewModel: MoviesViewModel) {
+
+    var selectedCategory by remember { mutableStateOf<MovieCategory>(MovieCategory.NowPlaying) }
+
+    Column(modifier = Modifier.padding(16.dp)) {  // categories word
+        Text(
+            text = "Categories",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp)
+    ) {
+
+        items(movieCategories) { category ->
+            MovieChip(
+                category = category,
+                selected = category == selectedCategory,
+                onSelected = {
+                    selectedCategory = category
+                    when (category) {
+                        MovieCategory.NowPlaying -> moviesViewModel.getNowPlayingMovies(1)
+                        MovieCategory.Popular -> moviesViewModel.getPopularMovies(1)
+                        MovieCategory.Upcoming -> moviesViewModel.getUpcomingMovies(1)
+                    }
+                }
+            )
+
+        }
+    }
+}
+
+val movieKinds = listOf(NOW_PLAYING, POPULAR, UPCOMING)
 
 @Composable
-fun fetchMovies(moviesViewModel: MoviesViewModel) {
+fun MovieChip(
+    category: MovieCategory,
+    selected: Boolean,
+    onSelected: () -> Unit
+) {
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.9f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+
+    )
+    val backgroundColor by animateColorAsState(
+        targetValue = when {
+            selected -> MaterialTheme.colorScheme.primaryContainer
+            else -> MaterialTheme.colorScheme.surface
+        },
+        animationSpec = tween(durationMillis = 300)
+    )
+
+    val contentColor by animateColorAsState(
+        targetValue = when {
+            selected -> MaterialTheme.colorScheme.onPrimaryContainer
+            else -> MaterialTheme.colorScheme.onSurface
+        },
+        animationSpec = tween(durationMillis = 300)
+    )
+
+// create Surface
+    Surface(
+        onClick = onSelected,
+        modifier = Modifier
+            .scale(scale)
+            .height(48.dp),
+        shape = RoundedCornerShape(24.dp),
+        color = backgroundColor,
+        tonalElevation = if (selected) 8.dp else 2.dp,
+        shadowElevation = if (isPressed) 4.dp else 0.dp,
+        interactionSource = interactionSource
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                imageVector = category.icon,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp)
+
+            )
+            Text(
+                text = category.title,
+                color = contentColor,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            // Animated check icon
+            AnimatedVisibility(
+                visible = selected,
+                enter = fadeIn() + expandHorizontally(),
+                exit = fadeOut() + shrinkHorizontally()
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
+fun fetchMovies(moviesViewModel: MoviesViewModel, navController: NavController) {
 
     LaunchedEffect(Unit) {
         moviesViewModel.getNowPlayingMovies(1)
@@ -109,25 +276,25 @@ fun fetchMovies(moviesViewModel: MoviesViewModel) {
             // first
             val movies = (moviesStateFlow as MovieApiState.Success).movies
             Log.d("TAG", "fetchMovies: $movies")
-            MovieList(movies)
+            MovieList(movies, navController)
         }
     }
 }
 
 @Composable
-fun MovieList(movies: List<Movie>) {
+fun MovieList(movies: List<Movie>, navController: NavController) {
     LazyRow(
         contentPadding = PaddingValues(8.dp)
     ) {
         itemsIndexed(movies) { index, movie ->
-            MovieItem(movie)
+            MovieItem(movie, navController)
 
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(movie: Movie, navController: NavController) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -136,7 +303,9 @@ fun MovieItem(movie: Movie) {
             .padding(horizontal = 8.dp)
             .fillMaxWidth()
             .animateContentSize()
-            .clickable {},
+            .clickable {
+                navController.navigate(Screens.DetailScreen.createRoute(movie.id))
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp,
             pressedElevation = 8.dp,

@@ -12,4 +12,19 @@ interface MovieApi {
             @Query("language") language: String = "en-US",
             @Query("page") page: Int = 1
         ): MovieResponse
+
+        // get pupular
+        @GET("upcoming")
+        suspend fun getPopularMovies(
+            @Query("api_key") apiKey: String = API_KEY,
+            @Query("language") language: String = "en-US",
+            @Query("page") page: Int = 1
+        ): MovieResponse
+
+    @GET("popular")
+    suspend fun getUpcomingMovies(
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1
+    ): MovieResponse
 }

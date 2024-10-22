@@ -24,23 +24,46 @@ class MoviesViewModel(private val repository: IRepository) : ViewModel() {
         viewModelScope.launch {
             repository.getNowPlayingMovies(page)
                 .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies -> _nowPlayingMovies.value = MovieApiState.Success(movies.results) } // pass here only the movies
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                } // pass here only the movies
         }
     }
 
-}
+    // get popular movies
+    fun getPopularMovies(page: Int) {
+        viewModelScope.launch {
+            repository.getPopularMovies(page)
+                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                }
+        }
+    }
+
+
+    // get popular movies
+    fun getUpcomingMovies(page: Int) {
+        viewModelScope.launch {
+            repository.getUpcomingMovies(page)
+                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
+                .collect { movies ->
+                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
+                }
+        }
+    }
 
 
 // create the viewModel Factory
+}
+    class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+                return MoviesViewModel(repo) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
 
-class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
-            return MoviesViewModel(repo) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+
 
     }
-
-
-}
