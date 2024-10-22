@@ -80,4 +80,8 @@ dependencies {
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+
+    // navigatio;n
+    implementation("androidx.navigation:navigation-compose:2.8.2")
+
 }
