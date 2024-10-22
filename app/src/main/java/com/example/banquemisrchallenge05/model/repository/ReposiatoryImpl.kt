@@ -1,6 +1,7 @@
 package com.example.banquemisrchallenge05.model.repository
 
 import com.example.banquemisrchallenge05.model.pojos.Movie
+import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
 import com.example.banquemisrchallenge05.model.pojos.MovieResponse
 import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import kotlinx.coroutines.flow.Flow
@@ -17,5 +18,9 @@ class ReposiatoryImpl(val remote: IRemoteDataSource) : IRepository {
 
     override suspend fun getUpcomingMovies(page: Int): Flow<MovieResponse> {
         return remote.getUpcomingMovies(page)
+    }
+
+    override suspend fun getMovieDetailsById(movieId: Int): Flow<MovieDetailsResponse> {
+        return remote.getMovieDetailsById(movieId)
     }
 }

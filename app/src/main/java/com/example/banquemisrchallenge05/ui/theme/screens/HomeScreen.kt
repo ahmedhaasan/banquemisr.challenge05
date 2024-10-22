@@ -83,7 +83,9 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.Brush
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 import com.google.gson.Gson
 
@@ -104,16 +106,33 @@ fun HomeContent(
     navController: NavController,
     innerPadding: PaddingValues
 ) {
-    Column(
+    // Gradient overlay
+    Box(
         modifier = Modifier
-            .padding(innerPadding)
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.7f),
+                        Color.Black.copy(alpha = 0.9f)
+                    )
+                )
+            )
+    )
+    {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
 
-    ) {
-        MovieChips(moviesViewModel)
-        Spacer(modifier = Modifier.height(30.dp))
-        fetchMovies(moviesViewModel, navController)
+        ) {
+            MovieChips(moviesViewModel)
+            Spacer(modifier = Modifier.height(30.dp))
+            fetchMovies(moviesViewModel, navController)
+        }
     }
+
+
 }
 
 
@@ -136,13 +155,22 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
 
     var selectedCategory by remember { mutableStateOf<MovieCategory>(MovieCategory.NowPlaying) }
 
-    Column(modifier = Modifier.padding(16.dp)) {  // categories word
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(16.dp) // Adjust the padding for the text inside the box
+    ) {
         Text(
             text = "Categories",
+            fontWeight = FontWeight.Bold,
+            fontSize = 25.sp,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
+            color = Color.Black // Optional: adjust text color for better visibility
         )
     }
+
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 4.dp)
@@ -304,7 +332,10 @@ fun MovieItem(movie: Movie, navController: NavController) {
             .fillMaxWidth()
             .animateContentSize()
             .clickable {
-                navController.navigate(Screens.DetailScreen.createRoute(movie.id))
+                navController.navigate(Screens.DetailScreen.createRoute(movie.id)){
+                   // popUpTo(Screens.HomeScreen.route) { inclusive = true }
+
+                }
             },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp,
@@ -329,25 +360,68 @@ fun MovieItem(movie: Movie, navController: NavController) {
                     .padding(vertical = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-            CustomText(
-                textToUse = " Title: ${movie.title}",
-                textColor = Color.Black,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(vertical = 4.dp)
+            Spacer(modifier = Modifier.height(12.dp))
 
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            CustomText(
-                textToUse = "Release Date: ${movie.release_date}",
-                textColor = Color.Black,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
+// Enhanced Title
+            Row(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Title:",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 20.sp,
+                        letterSpacing = 0.5.sp
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp,
+                        letterSpacing = 0.25.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
-            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Release Date:",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 16.sp,
+                        letterSpacing = 0.5.sp
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = (movie.release_date),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        letterSpacing = 0.25.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 

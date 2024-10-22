@@ -49,10 +49,13 @@ fun navigation() {
         composable(
             route = Screens.DetailScreen.route,
             arguments = listOf(navArgument("movie_id") { type = NavType.IntType })
+
         ) { backStackEntry ->
             val movie_id = backStackEntry.arguments?.getInt("movie_id")
             if (movie_id != null) {
-                DetailsScreen(navController, movie_id)
+                val moviesViewModel: MoviesViewModel =
+                    viewModel(factory = moviesViewModelFactory) // create the viewModel
+                DetailsScreen(navController, movie_id, moviesViewModel)
             }
         }
 
