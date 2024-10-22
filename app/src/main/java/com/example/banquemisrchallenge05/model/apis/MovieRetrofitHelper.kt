@@ -1,4 +1,4 @@
-package com.example.banquemisrchallenge05.model
+package com.example.banquemisrchallenge05.model.apis
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-object MOvieRetrofitHelper {
+object MovieRetrofitHelper {
 
     private val BaseUrl = "https://api.themoviedb.org/3/movie/"
     private val client = OkHttpClient.Builder()
