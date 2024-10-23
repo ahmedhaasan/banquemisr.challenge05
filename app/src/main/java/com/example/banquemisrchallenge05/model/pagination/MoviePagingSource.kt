@@ -12,6 +12,7 @@ import com.example.banquemisrchallenge05.model.apis.MovieApi
 import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import retrofit2.HttpException
+import java.io.IOException
 
 /**
  *      trying to implement the pagingation concept
@@ -45,15 +46,10 @@ class MoviePagingSource(
                 nextKey = if (response.results.isEmpty()) null else page + 1
             )
         } catch (e: HttpException) {
-            Log.e("MoviePagingSource", "HTTP Error: ${e.code()}", e)
-            when (e.code()) {
-                401 -> Log.e("MoviePagingSource", "Unauthorized - Check your API key", e)
-                429 -> Log.e("MoviePagingSource", "Rate limit exceeded", e)
-                else -> Log.e("MoviePagingSource", "HTTP Error: ${e.code()}", e)
-            }
+            LoadResult.Error(e)
+        } catch (e: IOException) {
             LoadResult.Error(e)
         } catch (e: Exception) {
-            Log.e("MoviePagingSource", "Error loading data", e)
             LoadResult.Error(e)
         }
     }
