@@ -10,6 +10,7 @@ import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -18,11 +19,13 @@ import kotlinx.coroutines.launch
  *      create the viewModel to fetch the movies Data ( now playing ), popular ,upcomming
  *      working with State Flow
  */
+
+
 class MoviesViewModel(private val repository: IRepository) : ViewModel() {
 
 
     // start change to use the pagging
-    private var currentMovieType = MutableStateFlow(MovieType.NOW_PLAYING)
+     var currentMovieType = MutableStateFlow(MovieType.NOW_PLAYING)
 
     val movies = currentMovieType.flatMapLatest { movieType ->
         when (movieType) {
@@ -38,7 +41,7 @@ class MoviesViewModel(private val repository: IRepository) : ViewModel() {
     }
 // get Movie Details
 private val _movieDetails = MutableStateFlow<MovieDetailsApiState>(MovieDetailsApiState.Loading)
-val movieDetails: StateFlow<MovieDetailsApiState> = _movieDetails
+    val movieDetails: StateFlow<MovieDetailsApiState> = _movieDetails.asStateFlow()
 
 fun getMovieDetailsById(movieId: Int) {
     viewModelScope.launch {

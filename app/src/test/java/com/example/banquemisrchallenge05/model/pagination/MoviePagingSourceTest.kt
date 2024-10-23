@@ -55,7 +55,7 @@ class MoviePagingSourceTest {
             total_results = 1
         )
 
-        // need some attention
+        // need some attention  // i think may mean when getNowPlayingMovies iscalled it returns mockResponse
         coEvery {
             mockApi.getNowPlayingMovies(any())
         } returns mockResponse
@@ -74,7 +74,7 @@ class MoviePagingSourceTest {
         // then
 
         assertTrue(result is PagingSource.LoadResult.Page)
-        assertEquals(mockMovie,(result as PagingSource.LoadResult.Page ).data.first())
+        assertEquals(mockMovie,(result as PagingSource.LoadResult.Page ).data.first())  // first movie in page
         assertEquals(null,result.prevKey)
         assertEquals(2,result.nextKey)
 

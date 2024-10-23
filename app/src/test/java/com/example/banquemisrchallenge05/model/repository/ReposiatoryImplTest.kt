@@ -1,6 +1,7 @@
 package com.example.banquemisrchallenge05.model.repository
 
 import androidx.paging.PagingData
+import androidx.paging.PagingSource
 import com.example.banquemisrchallenge05.model.apis.MovieApi
 import com.example.banquemisrchallenge05.model.pojos.Genre
 import com.example.banquemisrchallenge05.model.pojos.Movie
@@ -58,7 +59,6 @@ class ReposiatoryImplTest{
         // then
         assertNotNull(result)
         assertTrue(result is Flow<PagingData<Movie>>)
-
     }
 
     // test get Details function
@@ -67,7 +67,7 @@ class ReposiatoryImplTest{
         // Given
         val genre1 = Genre(1, "Drama")
         val genre2 = Genre(2, "Action")
-        val mockMovie = MovieDetailsResponse(
+        val mockMovieDetails = MovieDetailsResponse(
             id = 1,
             original_title = "Test Movie",
             release_date = "2023-09-01",
@@ -82,13 +82,13 @@ class ReposiatoryImplTest{
 
         coEvery {
             mockApi.getMovieDetailsById(1)
-        } returns mockMovie
+        } returns mockMovieDetails
 
         // when
         val result = repository.getMovieDetailsById(1)
         // then
         assertNotNull(result)
-        assertEquals(mockMovie, result.first())
+        assertEquals(mockMovieDetails, result.first())
 
     }
 }

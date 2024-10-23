@@ -100,4 +100,8 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("app.cash.turbine:turbine:1.0.0")  // for the state flow
     testImplementation("junit:junit:4.13.2")
+// for kotlin courotines
+    testImplementation("org.robolectric:robolectric:4.10.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 }
