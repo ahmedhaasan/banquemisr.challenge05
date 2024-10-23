@@ -10,17 +10,17 @@ import kotlinx.coroutines.flow.flowOf
 class RemoteDataSourceImpl : IRemoteDataSource {
     override suspend fun getNowPlayingMovies(page: Int): Flow<MovieResponse> {
 
-        val response = MovieRetrofitHelper.service.getNowPlayingMovies(page = page)
+        val response = MovieRetrofitHelper.service.getNowPlayingMovies(page = page.toString())
         return flowOf(response)
     }
 
     override suspend fun getPopularMovies(page: Int): Flow<MovieResponse> {
-        val response = MovieRetrofitHelper.service.getPopularMovies(page = page)
+        val response = MovieRetrofitHelper.service.getPopularMovies(page = page.toString())
         return flowOf(response)
     }
 
     override suspend fun getUpcomingMovies(page: Int): Flow<MovieResponse> {
-        val response = MovieRetrofitHelper.service.getUpcomingMovies(page = page)
+        val response = MovieRetrofitHelper.service.getUpcomingMovies(page = page.toString())
         return flowOf(response)
     }
 

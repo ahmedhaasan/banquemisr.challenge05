@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.banquemisrchallenge05.model.apis.MovieApi
+import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.remote.RemoteDataSourceImpl
 import com.example.banquemisrchallenge05.model.repository.IRepository
@@ -29,11 +31,10 @@ sealed class Screens(val route: String) {
     }
 }
 
-// define the factories for the viewModels
-
-val reposiatory: IRepository = ReposiatoryImpl(RemoteDataSourceImpl())
-val moviesViewModelFactory = MoviesViewModelFactory(reposiatory)
-
+// Initialize dependencies   // and a new way to pass the MovieApi instead of RemoteDataSourceImpl
+val movieApi = MovieRetrofitHelper.service
+val repository: IRepository = ReposiatoryImpl(movieApi)
+val moviesViewModelFactory = MoviesViewModelFactory(repository)
 @Composable
 fun navigation() {
 
