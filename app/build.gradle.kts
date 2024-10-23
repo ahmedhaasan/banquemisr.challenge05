@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.paging.common.android)
+    implementation(libs.androidx.paging.compose.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,6 +89,15 @@ dependencies {
 
     //
     implementation ("androidx.compose.animation:animation:1.7.4")
+    // pagination
+    implementation ("androidx.paging:paging-runtime-ktx:3.3.2")
 
+    // Testing
+    testImplementation("androidx.paging:paging-common:3.2.1")
 
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+    testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("app.cash.turbine:turbine:1.0.0")  // for the state flow
+    testImplementation("junit:junit:4.13.2")
 }

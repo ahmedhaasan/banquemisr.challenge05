@@ -3,12 +3,15 @@ package com.example.banquemisrchallenge05.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.apistates.MovieDetailsApiState
+import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -17,68 +20,48 @@ import kotlinx.coroutines.launch
  */
 class MoviesViewModel(private val repository: IRepository) : ViewModel() {
 
-    private val _nowPlayingMovies = MutableStateFlow<MovieApiState>(MovieApiState.Loading)
-    val nowPlayingMovies: StateFlow<MovieApiState> = _nowPlayingMovies // Change var to val
 
-    // for movie details
-    private val _movieDetails = MutableStateFlow<MovieDetailsApiState>(MovieDetailsApiState.Loading)
-    val movieDetails: StateFlow<MovieDetailsApiState> = _movieDetails
-    ////
-    fun getNowPlayingMovies(page: Int) {
-        viewModelScope.launch {
-            repository.getNowPlayingMovies(page)
-                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies ->
-                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
-                } // pass here only the movies
+    // start change to use the pagging
+    private var currentMovieType = MutableStateFlow(MovieType.NOW_PLAYING)
+
+    val movies = currentMovieType.flatMapLatest { movieType ->
+        when (movieType) {
+            MovieType.NOW_PLAYING -> repository.getNowPlayingMovies(1)
+            MovieType.POPULAR -> repository.getPopularMovies(1)
+            MovieType.UPCOMING -> repository.getUpcomingMovies(1)
         }
+
+    }.cachedIn(viewModelScope)
+
+    fun updateMovieType(type: MovieType) {   // to update the movie type and catch new Pages
+        currentMovieType.value = type
     }
+// get Movie Details
+private val _movieDetails = MutableStateFlow<MovieDetailsApiState>(MovieDetailsApiState.Loading)
+val movieDetails: StateFlow<MovieDetailsApiState> = _movieDetails
 
-    // get popular movies
-    fun getPopularMovies(page: Int) {
-        viewModelScope.launch {
-            repository.getPopularMovies(page)
-                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies ->
-                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
-                }
-        }
+fun getMovieDetailsById(movieId: Int) {
+    viewModelScope.launch {
+
+        repository.getMovieDetailsById(movieId)
+            .catch { error -> _movieDetails.value = MovieDetailsApiState.Failure(error) }
+            .collect { movieDetails ->
+                _movieDetails.value = MovieDetailsApiState.Success(movieDetails)
+            }
     }
-
-
-    // get popular movies
-    fun getUpcomingMovies(page: Int) {
-        viewModelScope.launch {
-            repository.getUpcomingMovies(page)
-                .catch { error -> _nowPlayingMovies.value = MovieApiState.Failure(error) }
-                .collect { movies ->
-                    _nowPlayingMovies.value = MovieApiState.Success(movies.results)
-                }
-        }
-    }
-
-    // get Movie Details
-    fun getMovieDetailsById(movieId: Int) {
-        viewModelScope.launch {
-
-            repository.getMovieDetailsById(movieId)
-                .catch { error -> _movieDetails.value = MovieDetailsApiState.Failure(error) }
-                .collect { movieDetails -> _movieDetails.value = MovieDetailsApiState.Success(movieDetails) }
-        }
-    }
-
+}
 
 
 // create the viewModel Factory
 }
-    class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
-                return MoviesViewModel(repo) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-
+class MoviesViewModelFactory(private val repo: IRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+            return MoviesViewModel(repo) as T
         }
-
+        throw IllegalArgumentException("Unknown ViewModel class")
 
     }
+
+
+}

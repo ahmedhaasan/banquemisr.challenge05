@@ -10,24 +10,23 @@ import retrofit2.http.Query
 interface MovieApi {
     @GET("now_playing")
     suspend fun getNowPlayingMovies(
+        @Query("page") page: String,
         @Query("api_key") apiKey: String = API_KEY,
-        @Query("language") language: String = "en-US",
-        @Query("page") page: Int = 1
-    ): MovieResponse
-
-    // get pupular
-    @GET("upcoming")
-    suspend fun getPopularMovies(
-        @Query("api_key") apiKey: String = API_KEY,
-        @Query("language") language: String = "en-US",
-        @Query("page") page: Int = 1
+        @Query("language") language: String = "en-US"
     ): MovieResponse
 
     @GET("popular")
-    suspend fun getUpcomingMovies(
+    suspend fun getPopularMovies(
+        @Query("page") page: String,
         @Query("api_key") apiKey: String = API_KEY,
-        @Query("language") language: String = "en-US",
-        @Query("page") page: Int = 1
+        @Query("language") language: String = "en-US"
+    ): MovieResponse
+
+    @GET("upcoming")
+    suspend fun getUpcomingMovies(
+        @Query("page") page: String,
+        @Query("api_key") apiKey: String = API_KEY,
+        @Query("language") language: String = "en-US"
     ): MovieResponse
 
     @GET("{movie_id}")
@@ -35,5 +34,4 @@ interface MovieApi {
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String = API_KEY
     ): MovieDetailsResponse
-
 }

@@ -86,22 +86,34 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Brush
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 import com.google.gson.Gson
 
 @Composable
 fun HomeScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
+    val movies = moviesViewModel.movies.collectAsLazyPagingItems()  // collect
+    Log.d("HomeScreen", "movies: ${movies.itemCount}")
 
     Scaffold(
         containerColor = Color.White,
     ) { innerPadding ->
-        HomeContent(moviesViewModel, navController, innerPadding)
+        HomeContent(
+            movies = movies,
+            moviesViewModel,
+            navController,
+            innerPadding
+        )
 
     }
 }
 
 @Composable
 fun HomeContent(
+    movies: LazyPagingItems<Movie>,
     moviesViewModel: MoviesViewModel,
     navController: NavController,
     innerPadding: PaddingValues
@@ -128,7 +140,7 @@ fun HomeContent(
         ) {
             MovieChips(moviesViewModel)
             Spacer(modifier = Modifier.height(30.dp))
-            fetchMovies(moviesViewModel, navController)
+            MovieList(movies, navController)
         }
     }
 
@@ -136,24 +148,18 @@ fun HomeContent(
 }
 
 
-//
-sealed class MovieCategory(val title: String, val icon: ImageVector) {
-    object NowPlaying : MovieCategory("Now Playing", Icons.Filled.PlayArrow)
-    object Popular : MovieCategory("Popular", Icons.Filled.Favorite)
-    object Upcoming : MovieCategory("Upcoming", Icons.Filled.DateRange)
-}
-
+// Replace movieCategories list
 val movieCategories = listOf(
-    MovieCategory.NowPlaying,
-    MovieCategory.Popular,
-    MovieCategory.Upcoming
+    MovieType.NOW_PLAYING,
+    MovieType.POPULAR,
+    MovieType.UPCOMING
 )
 
 //
 @Composable
 fun MovieChips(moviesViewModel: MoviesViewModel) {
 
-    var selectedCategory by remember { mutableStateOf<MovieCategory>(MovieCategory.NowPlaying) }
+    var selectedType by remember { mutableStateOf(MovieType.NOW_PLAYING) }
 
     Box(
         modifier = Modifier
@@ -177,16 +183,17 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
     ) {
 
         items(movieCategories) { category ->
+            val movieType = when(category){
+                MovieType.NOW_PLAYING -> MovieType.NOW_PLAYING
+                MovieType.POPULAR ->  MovieType.POPULAR
+                MovieType.UPCOMING -> MovieType.UPCOMING
+            }
             MovieChip(
                 category = category,
-                selected = category == selectedCategory,
+                selected = category == selectedType,
                 onSelected = {
-                    selectedCategory = category
-                    when (category) {
-                        MovieCategory.NowPlaying -> moviesViewModel.getNowPlayingMovies(1)
-                        MovieCategory.Popular -> moviesViewModel.getPopularMovies(1)
-                        MovieCategory.Upcoming -> moviesViewModel.getUpcomingMovies(1)
-                    }
+                    selectedType = movieType
+                    moviesViewModel.updateMovieType(movieType)
                 }
             )
 
@@ -198,7 +205,7 @@ val movieKinds = listOf(NOW_PLAYING, POPULAR, UPCOMING)
 
 @Composable
 fun MovieChip(
-    category: MovieCategory,
+    category: MovieType,
     selected: Boolean,
     onSelected: () -> Unit
 ) {
@@ -279,44 +286,54 @@ fun MovieChip(
 
 }
 
+// this list need attintion from me again after using pager
 @Composable
-fun fetchMovies(moviesViewModel: MoviesViewModel, navController: NavController) {
-
-    LaunchedEffect(Unit) {
-        moviesViewModel.getNowPlayingMovies(1)
-    }
-
-    val moviesStateFlow by moviesViewModel.nowPlayingMovies.collectAsState()
-
-    when (moviesStateFlow) {
-        is MovieApiState.Loading -> {
-            LoadingScreen() // when loading
-        }
-
-        is MovieApiState.Failure -> {
-            val state = moviesStateFlow as MovieApiState.Failure
-            ErrorScreen(message = state.msg.toString()) {
-                moviesViewModel.getNowPlayingMovies(1)
-            }
-        }
-
-        is MovieApiState.Success -> {
-            // first
-            val movies = (moviesStateFlow as MovieApiState.Success).movies
-            Log.d("TAG", "fetchMovies: $movies")
-            MovieList(movies, navController)
-        }
-    }
-}
-
-@Composable
-fun MovieList(movies: List<Movie>, navController: NavController) {
+fun MovieList(
+    movies: LazyPagingItems<Movie>,
+    navController: NavController
+) {
     LazyRow(
         contentPadding = PaddingValues(8.dp)
     ) {
-        itemsIndexed(movies) { index, movie ->
-            MovieItem(movie, navController)
+        items(
+            count = movies.itemCount,
+            key = { index -> movies[index]?.id ?: index }
+        ) { index ->
+            movies[index]?.let { movie ->
+                MovieItem(movie = movie, navController)
+            }
+        }
+        movies.apply {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item { LoadingScreen() }
+                }
 
+                loadState.append is LoadState.Loading -> {
+                    item { LoadingScreen() }
+
+                }
+
+                loadState.refresh is LoadState.Error -> {
+                    val error = movies.loadState.refresh as LoadState.Error
+                    item {
+                        ErrorScreen(
+                            message = error.error.localizedMessage ?: "Error",
+                            onRetry = { retry() }
+                        )
+                    }
+                }
+
+                loadState.append is LoadState.Error -> {
+                    val error = movies.loadState.append as LoadState.Error // Fix here
+                    item {
+                        ErrorScreen(
+                            message = error.error.localizedMessage ?: "Error",
+                            onRetry = { retry() }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -332,8 +349,8 @@ fun MovieItem(movie: Movie, navController: NavController) {
             .fillMaxWidth()
             .animateContentSize()
             .clickable {
-                navController.navigate(Screens.DetailScreen.createRoute(movie.id)){
-                   // popUpTo(Screens.HomeScreen.route) { inclusive = true }
+                navController.navigate(Screens.DetailScreen.createRoute(movie.id)) {
+                    // popUpTo(Screens.HomeScreen.route) { inclusive = true }
 
                 }
             },
