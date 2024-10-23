@@ -8,8 +8,6 @@ import com.example.banquemisrchallenge05.model.pagination.MoviePagingSource
 import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
-import com.example.banquemisrchallenge05.model.pojos.MovieResponse
-import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
