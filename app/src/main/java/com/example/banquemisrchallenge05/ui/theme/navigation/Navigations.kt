@@ -14,7 +14,7 @@ import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.remote.RemoteDataSourceImpl
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import com.example.banquemisrchallenge05.model.repository.ReposiatoryImpl
-import com.example.banquemisrchallenge05.network.NetworkObserver
+import com.example.banquemisrchallenge05.model.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.screens.DetailsScreen
 import com.example.banquemisrchallenge05.ui.theme.screens.HomeScreen
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel

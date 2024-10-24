@@ -91,7 +91,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.banquemisrchallenge05.NetworkErrorContent
 import com.example.banquemisrchallenge05.model.pagination.MovieType
-import com.example.banquemisrchallenge05.network.NetworkObserver
+import com.example.banquemisrchallenge05.model.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 import com.google.gson.Gson
 

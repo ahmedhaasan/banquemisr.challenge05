@@ -51,7 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.example.banquemisrchallenge05.NetworkErrorContent
 import com.example.banquemisrchallenge05.R
-import com.example.banquemisrchallenge05.network.NetworkObserver
+import com.example.banquemisrchallenge05.model.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
