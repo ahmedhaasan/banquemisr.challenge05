@@ -201,7 +201,6 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
     }
 }
 
-val movieKinds = listOf(NOW_PLAYING, POPULAR, UPCOMING)
 
 @Composable
 fun MovieChip(
@@ -297,7 +296,6 @@ fun MovieList(
     ) {
         items(
             count = movies.itemCount,
-            key = { index -> movies[index]?.id ?: index }
         ) { index ->
             movies[index]?.let { movie ->
                 MovieItem(movie = movie, navController)

@@ -22,9 +22,9 @@ import retrofit2.Response
  *      working to try to test the pagination
  */
 class MoviePagingSourceTest {
+
     private val mockApi = mockk<MovieApi>()
     private lateinit var pagingSource: MoviePagingSource
-
 
 // befor
 
@@ -35,7 +35,6 @@ class MoviePagingSourceTest {
     }
 
     @Test
-
    fun LoadPage_returnPageWhenApi_isSuccess() = runTest {
 
        // Given
