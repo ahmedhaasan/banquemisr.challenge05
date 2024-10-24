@@ -49,7 +49,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
+import com.example.banquemisrchallenge05.NetworkErrorContent
 import com.example.banquemisrchallenge05.R
+import com.example.banquemisrchallenge05.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,13 +59,21 @@ import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 fun DetailsScreen(
     navController: NavController,
     movie_id: Int,
-    viewModel: MoviesViewModel
+    viewModel: MoviesViewModel,
+    networkObserver: NetworkObserver
 ) {
     Scaffold(
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            fetchMovieDetails(viewModel = viewModel, movieId = movie_id,navController)
-        }
+
+        val isConnected by networkObserver.isConnected.collectAsState()
+        if(isConnected){
+            Box(modifier = Modifier.padding(padding)) {
+                fetchMovieDetails(viewModel = viewModel, movieId = movie_id,navController)
+            }
+        }else
+        {
+            NetworkErrorContent()}
+
     }
 }
 

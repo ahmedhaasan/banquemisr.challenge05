@@ -89,25 +89,35 @@ import androidx.compose.ui.graphics.Brush
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.banquemisrchallenge05.NetworkErrorContent
 import com.example.banquemisrchallenge05.model.pagination.MovieType
+import com.example.banquemisrchallenge05.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.navigation.Screens
 import com.google.gson.Gson
 
 @Composable
-fun HomeScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
-    val movies = moviesViewModel.movies.collectAsLazyPagingItems()  // collect
-    Log.d("HomeScreen", "movies: ${movies.itemCount}")
+fun HomeScreen(
+    navController: NavController,
+    moviesViewModel: MoviesViewModel,
+    networkObserver: NetworkObserver
+) {
+    val isConnected by networkObserver.isConnected.collectAsState()
+    if (isConnected) {
+        val movies = moviesViewModel.movies.collectAsLazyPagingItems()  // collect
+        Log.d("HomeScreen", "movies: ${movies.itemCount}")
+        Scaffold(
+            containerColor = Color.White,
+        ) { innerPadding ->
+            HomeContent(
+                movies = movies,
+                moviesViewModel,
+                navController,
+                innerPadding
+            )
 
-    Scaffold(
-        containerColor = Color.White,
-    ) { innerPadding ->
-        HomeContent(
-            movies = movies,
-            moviesViewModel,
-            navController,
-            innerPadding
-        )
-
+        }
+    } else {
+        NetworkErrorContent()
     }
 }
 
@@ -183,9 +193,9 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
     ) {
 
         items(movieCategories) { category ->
-            val movieType = when(category){
+            val movieType = when (category) {
                 MovieType.NOW_PLAYING -> MovieType.NOW_PLAYING
-                MovieType.POPULAR ->  MovieType.POPULAR
+                MovieType.POPULAR -> MovieType.POPULAR
                 MovieType.UPCOMING -> MovieType.UPCOMING
             }
             MovieChip(
@@ -201,7 +211,6 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
     }
 }
 
-val movieKinds = listOf(NOW_PLAYING, POPULAR, UPCOMING)
 
 @Composable
 fun MovieChip(
@@ -297,7 +306,6 @@ fun MovieList(
     ) {
         items(
             count = movies.itemCount,
-            key = { index -> movies[index]?.id ?: index }
         ) { index ->
             movies[index]?.let { movie ->
                 MovieItem(movie = movie, navController)
