@@ -1,12 +1,11 @@
 package com.example.banquemisrchallenge05.model.repository
 
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import com.example.banquemisrchallenge05.model.apis.MovieApi
 import com.example.banquemisrchallenge05.model.pojos.Genre
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
 import com.example.banquemisrchallenge05.model.pojos.MovieResponse
+import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -14,19 +13,21 @@ import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 
-class ReposiatoryImplTest{
+class RepositoryImplTest{
 
-    private val mockApi = mockk<MovieApi>()
-    private lateinit var repository: ReposiatoryImpl
+    private val remote = mockk<IRemoteDataSource>()
+    private lateinit var repository: RepositoryImpl
 
     @Before
     fun setUp(){
-        repository = ReposiatoryImpl(mockApi)
+        repository = RepositoryImpl(remote)
     }
 
     // first function to Test
@@ -50,8 +51,8 @@ class ReposiatoryImplTest{
         )
 
         coEvery {
-            mockApi.getNowPlayingMovies(any())
-            } returns mockResponse
+            remote.getNowPlayingMovies(any())
+            } returns flowOf(mockResponse)
 
         // when
         val result = repository.getNowPlayingMovies(1)
@@ -81,8 +82,8 @@ class ReposiatoryImplTest{
 
 
         coEvery {
-            mockApi.getMovieDetailsById(1)
-        } returns mockMovieDetails
+            remote.getMovieDetailsById(1)
+        } returns flowOf(mockMovieDetails)
 
         // when
         val result = repository.getMovieDetailsById(1)

@@ -5,10 +5,12 @@ import androidx.paging.PagingSource
 import com.example.banquemisrchallenge05.model.apis.MovieApi
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieResponse
+import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
@@ -23,7 +25,7 @@ import retrofit2.Response
  */
 class MoviePagingSourceTest {
 
-    private val mockApi = mockk<MovieApi>()
+    private val mockApi = mockk<IRemoteDataSource>()
     private lateinit var pagingSource: MoviePagingSource
 
 // befor
@@ -57,7 +59,7 @@ class MoviePagingSourceTest {
         // need some attention  // i think may mean when getNowPlayingMovies iscalled it returns mockResponse
         coEvery {
             mockApi.getNowPlayingMovies(any())
-        } returns mockResponse
+        } returns flowOf(mockResponse)
 
         // When
         val result = pagingSource.load(

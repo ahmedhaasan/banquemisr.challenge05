@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-
-    id("com.google.dagger.hilt.android") // Hilt plugin
+    id("com.google.dagger.hilt.android") // Hilt Plugin
     id("kotlin-kapt") // Kapt for annotation processing
 }
 
@@ -49,6 +48,15 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    // for hilt
+    kapt {
+        correctErrorTypes = true
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
@@ -112,7 +120,10 @@ dependencies {
 
 
     // Hilt dependencies
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+
+    // Hilt Jetpack Compose integration
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 }
