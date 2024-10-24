@@ -8,20 +8,23 @@ import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.apistates.MovieDetailsApiState
 import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.model.repository.IRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  *      create the viewModel to fetch the movies Data ( now playing ), popular ,upcomming
  *      working with State Flow
  */
 
-
-class MoviesViewModel(private val repository: IRepository) : ViewModel() {
+@HiltViewModel
+class MoviesViewModel
+    @Inject constructor(private val repository: IRepository) : ViewModel() {
 
 
     // start change to use the pagging

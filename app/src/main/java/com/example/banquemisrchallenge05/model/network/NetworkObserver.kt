@@ -1,4 +1,4 @@
-package com.example.banquemisrchallenge05.network
+package com.example.banquemisrchallenge05.model.network
 
 import android.content.Context
 import android.net.ConnectivityManager

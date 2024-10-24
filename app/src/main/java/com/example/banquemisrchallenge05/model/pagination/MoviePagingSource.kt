@@ -1,16 +1,11 @@
 package com.example.banquemisrchallenge05.model.pagination
 
-import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.banquemisrchallenge05.model.apis.MovieApi
-import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.pojos.Movie
+import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
+import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -20,7 +15,7 @@ import java.io.IOException
 
 
 class MoviePagingSource(
-    private val movieApi: MovieApi,
+    private val remoteDataSource: IRemoteDataSource,
     private val movieType: MovieType
 ) : PagingSource<Int, Movie>() {
 
@@ -35,10 +30,11 @@ class MoviePagingSource(
         return try {
             val page = params.key ?: 1
             val response = when (movieType) {
-                MovieType.NOW_PLAYING -> movieApi.getNowPlayingMovies(page.toString())
-                MovieType.POPULAR -> movieApi.getPopularMovies(page.toString())
-                MovieType.UPCOMING -> movieApi.getUpcomingMovies(page.toString())
-            }
+                MovieType.NOW_PLAYING -> remoteDataSource.getNowPlayingMovies(page)
+                MovieType.POPULAR -> remoteDataSource.getPopularMovies(page)
+                MovieType.UPCOMING -> remoteDataSource.getUpcomingMovies(page)
+            }.first() // Collect the first value from the Flow
+
 
             LoadResult.Page(
                 data = response.results,

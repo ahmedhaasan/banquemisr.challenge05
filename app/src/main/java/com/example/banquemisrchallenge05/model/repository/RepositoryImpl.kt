@@ -8,12 +8,12 @@ import com.example.banquemisrchallenge05.model.pagination.MoviePagingSource
 import com.example.banquemisrchallenge05.model.pagination.MovieType
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
+import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-
-class ReposiatoryImpl(
-    private val movieApi: MovieApi
+class RepositoryImpl(
+    private val remote: IRemoteDataSource
 ) : IRepository {
     override suspend fun getNowPlayingMovies(page: Int): Flow<PagingData<Movie>> {
         return Pager(
@@ -23,7 +23,7 @@ class ReposiatoryImpl(
                 prefetchDistance = 2
             ),
             pagingSourceFactory = {
-                MoviePagingSource(movieApi, MovieType.NOW_PLAYING)
+                MoviePagingSource(remote, MovieType.NOW_PLAYING)
             }
         ).flow
     }
@@ -37,7 +37,7 @@ class ReposiatoryImpl(
                 prefetchDistance = 2
             ),
             pagingSourceFactory = {
-                MoviePagingSource(movieApi, MovieType.POPULAR)
+                MoviePagingSource(remote, MovieType.POPULAR)
             }
         ).flow
     }
@@ -50,15 +50,15 @@ class ReposiatoryImpl(
                 prefetchDistance = 2
             ),
             pagingSourceFactory = {
-                MoviePagingSource(movieApi, MovieType.UPCOMING)
+                MoviePagingSource(remote, MovieType.UPCOMING)
             }
         ).flow
     }
 
 
-// details below
-override suspend fun getMovieDetailsById(movieId: Int): Flow<MovieDetailsResponse> {
-    return flowOf(movieApi.getMovieDetailsById(movieId))
-}
+    // details below
+    override suspend fun getMovieDetailsById(movieId: Int): Flow<MovieDetailsResponse> {
+        return remote.getMovieDetailsById(movieId)
+    }
 
 }
