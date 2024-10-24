@@ -14,6 +14,7 @@ import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.remote.RemoteDataSourceImpl
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import com.example.banquemisrchallenge05.model.repository.ReposiatoryImpl
+import com.example.banquemisrchallenge05.network.NetworkObserver
 import com.example.banquemisrchallenge05.ui.theme.screens.DetailsScreen
 import com.example.banquemisrchallenge05.ui.theme.screens.HomeScreen
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel
@@ -36,7 +37,7 @@ val movieApi = MovieRetrofitHelper.service
 val repository: IRepository = ReposiatoryImpl(movieApi)
 val moviesViewModelFactory = MoviesViewModelFactory(repository)
 @Composable
-fun navigation() {
+fun navigation(networkObserver: NetworkObserver) {
 
     val navController = rememberNavController()
 
@@ -44,7 +45,7 @@ fun navigation() {
         composable(route = Screens.HomeScreen.route) {
             val moviesViewModel: MoviesViewModel =
                 viewModel(factory = moviesViewModelFactory) // create the viewModel
-            HomeScreen(navController, moviesViewModel)
+            HomeScreen(navController, moviesViewModel, networkObserver)
         }
 
         composable(
@@ -56,7 +57,7 @@ fun navigation() {
             if (movie_id != null) {
                 val moviesViewModel: MoviesViewModel =
                     viewModel(factory = moviesViewModelFactory) // create the viewModel
-                DetailsScreen(navController, movie_id, moviesViewModel)
+                DetailsScreen(navController, movie_id, moviesViewModel,networkObserver)
             }
         }
 

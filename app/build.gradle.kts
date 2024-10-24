@@ -104,4 +104,8 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10.3")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
+    // lotti animation
+    implementation("com.airbnb.android:lottie-compose:5.0.3") // Lottie in Compose
+
+
 }

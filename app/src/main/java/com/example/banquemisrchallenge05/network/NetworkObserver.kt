@@ -36,7 +36,7 @@ class NetworkObserver(context : Context) {
             connnectivityManager.registerNetworkCallback(networkRequest,networkCallBack)
     }
 
-    fun Unregister(){
+    fun unRegister(){
         connnectivityManager.unregisterNetworkCallback(networkCallBack)
     }
 }
