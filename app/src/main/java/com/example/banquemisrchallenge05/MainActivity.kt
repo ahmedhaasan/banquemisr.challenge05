@@ -4,44 +4,29 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.banquemisrchallenge05.ui.theme.Banquemisrchallenge05Theme
-
+import com.example.banquemisrchallenge05.model.network.NetworkObserver
+import com.example.banquemisrchallenge05.ui.theme.navigation.navigation
+import dagger.hilt.android.AndroidEntryPoint
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private lateinit var networkObserver: NetworkObserver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // initialize network observer
+        networkObserver = NetworkObserver(applicationContext)
+        networkObserver.Register()  // register it
+
         enableEdgeToEdge()
         setContent {
-            Banquemisrchallenge05Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            navigation(networkObserver)
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Banquemisrchallenge05Theme {
-        Greeting("Android")
+    override fun onDestroy() {
+        super.onDestroy()
+        networkObserver.unRegister()  // Unregister the network callback
     }
 }
+
