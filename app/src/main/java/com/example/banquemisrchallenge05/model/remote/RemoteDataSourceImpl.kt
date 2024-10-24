@@ -1,7 +1,6 @@
 package com.example.banquemisrchallenge05.model.remote
 
 import com.example.banquemisrchallenge05.model.apis.MovieApi
-import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
 import com.example.banquemisrchallenge05.model.pojos.MovieResponse

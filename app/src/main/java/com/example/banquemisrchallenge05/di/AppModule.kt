@@ -1,7 +1,6 @@
 package com.example.banquemisrchallenge05.di
 
 import com.example.banquemisrchallenge05.model.apis.MovieApi
-import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import com.example.banquemisrchallenge05.model.remote.RemoteDataSourceImpl
 import com.example.banquemisrchallenge05.model.repository.IRepository

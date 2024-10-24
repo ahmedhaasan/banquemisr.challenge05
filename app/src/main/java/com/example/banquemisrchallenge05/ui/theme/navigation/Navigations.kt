@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.banquemisrchallenge05.di.AppModule
-import com.example.banquemisrchallenge05.model.apis.MovieRetrofitHelper
 import com.example.banquemisrchallenge05.model.repository.IRepository
 import com.example.banquemisrchallenge05.model.repository.RepositoryImpl
 import com.example.banquemisrchallenge05.model.network.NetworkObserver
