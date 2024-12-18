@@ -35,7 +35,6 @@ class MoviePagingSource(
                 MovieType.UPCOMING -> remoteDataSource.getUpcomingMovies(page)
             }.first() // Collect the first value from the Flow
 
-
             LoadResult.Page(
                 data = response.results,
                 prevKey = if (page == 1) null else page - 1,

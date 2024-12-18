@@ -68,23 +68,23 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.banquemisrchallenge05.NOW_PLAYING
-import com.example.banquemisrchallenge05.POPULAR
-import com.example.banquemisrchallenge05.UPCOMING
-import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.*
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -107,7 +107,9 @@ fun HomeScreen(
         Log.d("HomeScreen", "movies: ${movies.itemCount}")
         Scaffold(
             containerColor = Color.White,
+            topBar = { MovieTopBar() } // put bar here
         ) { innerPadding ->
+
             HomeContent(
                 movies = movies,
                 moviesViewModel,
@@ -185,6 +187,10 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
             style = MaterialTheme.typography.titleLarge,
             color = Color.Black // Optional: adjust text color for better visibility
         )
+
+        // Search Bar
+
+
     }
 
     LazyRow(
@@ -537,3 +543,46 @@ fun ErrorScreen(message: String, onRetry: () -> Unit) {
 
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovieTopBar() {
+    TopAppBar(
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 6.dp)
+            .height(50.dp)
+            .clip(RoundedCornerShape(35.dp))
+            .shadow(8.dp, RoundedCornerShape(20.dp)),
+        title = {
+            Text("Movies Challenge", color = Color.White)
+        },
+        navigationIcon = {
+            // Search Icon
+            IconButton(
+                onClick = {},
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(100.dp),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = overlayColor
+        )
+    )
+}
+
+val startColor = Color.Black.copy(alpha = 0.7f)
+val endColor = Color.Black.copy(alpha = 0.9f)
+
+// Blend the two colors by averaging their components
+val overlayColor = Color(
+    red = (startColor.red + endColor.red) / 2,
+    green = (startColor.green + endColor.green) / 2,
+    blue = (startColor.blue + endColor.blue) / 2,
+    alpha = (startColor.alpha + endColor.alpha) / 2
+)
