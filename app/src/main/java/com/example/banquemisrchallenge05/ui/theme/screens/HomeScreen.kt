@@ -78,14 +78,21 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.Navigation
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -107,7 +114,7 @@ fun HomeScreen(
         Log.d("HomeScreen", "movies: ${movies.itemCount}")
         Scaffold(
             containerColor = Color.White,
-            topBar = { MovieTopBar() } // put bar here
+
         ) { innerPadding ->
 
             HomeContent(
@@ -135,12 +142,7 @@ fun HomeContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Black.copy(alpha = 0.7f),
-                        Color.Black.copy(alpha = 0.9f)
-                    )
-                )
+              gradientColors
             )
     )
     {
@@ -150,6 +152,8 @@ fun HomeContent(
                 .fillMaxSize()
 
         ) {
+            // the search bar and  titel
+            MovieTopBar("Movies challenge ", navController)
             MovieChips(moviesViewModel)
             Spacer(modifier = Modifier.height(30.dp))
             MovieList(movies, navController)
@@ -173,25 +177,25 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
 
     var selectedType by remember { mutableStateOf(MovieType.NOW_PLAYING) }
 
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(16.dp) // Adjust the padding for the text inside the box
-    ) {
-        Text(
-            text = "Categories",
-            fontWeight = FontWeight.Bold,
-            fontSize = 25.sp,
-            style = MaterialTheme.typography.titleLarge,
-            color = Color.Black // Optional: adjust text color for better visibility
-        )
+    /*    Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(16.dp) // Adjust the padding for the text inside the box
+        ) {
+            Text(
+                text = "Categories",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black // Optional: adjust text color for better visibility
+            )
 
-        // Search Bar
+            // Search Bar
 
 
-    }
+        }*/
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -546,43 +550,55 @@ fun ErrorScreen(message: String, onRetry: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieTopBar() {
-    TopAppBar(
+fun MovieTopBar(title: String, controller: NavController) {
+    CenterAlignedTopAppBar(
         modifier = Modifier
-            .padding(horizontal = 15.dp, vertical = 6.dp)
-            .height(50.dp)
+            .padding(horizontal = 15.dp, vertical = 10.dp)
+            .wrapContentHeight()// Increased height for balance
+            .windowInsetsPadding(WindowInsets.systemBars)
             .clip(RoundedCornerShape(35.dp))
             .shadow(8.dp, RoundedCornerShape(20.dp)),
+
         title = {
-            Text("Movies Challenge", color = Color.White)
+            Text(
+                title,
+                color = Color.Black,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp),
+                textAlign = TextAlign.Center
+            )
         },
         navigationIcon = {
-            // Search Icon
             IconButton(
-                onClick = {},
-                modifier = Modifier.padding(8.dp)
+                onClick = {controller.navigate(Screens.SearchScreen.route)},
+                modifier = Modifier.padding(10.dp)
+
             ) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(100.dp),
+                    tint = Color.Black,
+                    modifier = Modifier.size(36.dp) // Larger icon
+
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = overlayColor
-        )
+            containerColor = Color.White
+        ),
     )
 }
 
-val startColor = Color.Black.copy(alpha = 0.7f)
-val endColor = Color.Black.copy(alpha = 0.9f)
 
-// Blend the two colors by averaging their components
-val overlayColor = Color(
-    red = (startColor.red + endColor.red) / 2,
-    green = (startColor.green + endColor.green) / 2,
-    blue = (startColor.blue + endColor.blue) / 2,
-    alpha = (startColor.alpha + endColor.alpha) / 2
+// gRadiant color
+
+val gradientColors =  Brush.verticalGradient(
+    colors = listOf(
+        Color.Black.copy(alpha = 0.7f),
+        Color.Black.copy(alpha = 0.9f)
+    )
 )

@@ -19,5 +19,7 @@ data class  Movie(
     val release_date:String,
     val overview:String,
     val poster_path:String,
-    val genre_ids:List<Int>
-): Serializable
+    val genre_ids:List<Int>,
+    val vote_average :Double,
+
+    ): Serializable

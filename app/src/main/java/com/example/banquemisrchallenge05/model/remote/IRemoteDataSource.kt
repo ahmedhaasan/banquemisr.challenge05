@@ -11,4 +11,5 @@ interface IRemoteDataSource {
     suspend fun getPopularMovies(page: Int): Flow<MovieResponse>
     suspend fun getUpcomingMovies(page: Int): Flow<MovieResponse>
     suspend fun getMovieDetailsById(movieId: Int): Flow<MovieDetailsResponse>
+    suspend fun searchMovies(query: String): Flow<MovieResponse>
 }

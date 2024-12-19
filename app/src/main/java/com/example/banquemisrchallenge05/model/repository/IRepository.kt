@@ -13,5 +13,9 @@ interface IRepository {
     // details below
     suspend fun getMovieDetailsById(movieId: Int): Flow<MovieDetailsResponse>
 
+    // search on movies
+    suspend fun searchMovies(query: String): Flow<List<Movie>>
+
+
 
 }
