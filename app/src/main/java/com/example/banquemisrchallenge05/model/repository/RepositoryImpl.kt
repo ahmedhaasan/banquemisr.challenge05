@@ -1,5 +1,6 @@
 package com.example.banquemisrchallenge05.model.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -10,7 +11,9 @@ import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.model.pojos.MovieDetailsResponse
 import com.example.banquemisrchallenge05.model.remote.IRemoteDataSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 class RepositoryImpl(
     private val remote: IRemoteDataSource
@@ -53,6 +56,18 @@ class RepositoryImpl(
                 MoviePagingSource(remote, MovieType.UPCOMING)
             }
         ).flow
+    }
+
+    // search on movies
+    override suspend fun searchMovies(query: String): Flow<List<Movie>> {
+        return remote.searchMovies(query)
+            .map { response ->
+                Log.d("SearchMovies", "Received ${response.results.size} movies")
+                response.results
+            }.catch {
+                Log.e("SearchMovies", "Error in Repository: ${it.message}")
+                throw it
+            }
     }
 
 

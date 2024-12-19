@@ -1,5 +1,6 @@
 package com.example.banquemisrchallenge05.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -57,6 +58,33 @@ fun getMovieDetailsById(movieId: Int) {
     }
 }
 
+
+    // movie Search
+    private val _moviesSearch = MutableStateFlow<MovieApiState>(MovieApiState.Loading)
+    val moviesSearch: StateFlow<MovieApiState> = _moviesSearch.asStateFlow()
+
+    fun searchMovies(query: String) {
+        viewModelScope.launch {
+            _moviesSearch.value = MovieApiState.Loading
+            try {
+                repository.searchMovies(query)
+                    .catch { error ->
+                        Log.e("SearchMovies", " vm Search error: ${error.message}")
+                        _moviesSearch.value = MovieApiState.Failure(error)
+                    }
+                    .collect { movies ->
+                        _moviesSearch.value = if (movies.isEmpty()) {
+                            MovieApiState.Success(emptyList())
+                        } else {
+                            MovieApiState.Success(movies)
+                        }
+                    }
+            } catch (e: Exception) {
+                Log.e("SearchMovies", "ViewModel Unexpected error: ${e.message}")
+                _moviesSearch.value = MovieApiState.Failure(e)
+            }
+        }
+    }
 
 // create the viewModel Factory
 }

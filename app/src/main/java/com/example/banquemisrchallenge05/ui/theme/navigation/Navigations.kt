@@ -7,20 +7,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.banquemisrchallenge05.di.AppModule
-import com.example.banquemisrchallenge05.model.repository.IRepository
-import com.example.banquemisrchallenge05.model.repository.RepositoryImpl
 import com.example.banquemisrchallenge05.model.network.NetworkObserver
-import com.example.banquemisrchallenge05.model.remote.RemoteDataSourceImpl
 import com.example.banquemisrchallenge05.ui.theme.screens.DetailsScreen
 import com.example.banquemisrchallenge05.ui.theme.screens.HomeScreen
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel
-import com.example.banquemisrchallenge05.viewmodels.MoviesViewModelFactory
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
+
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.banquemisrchallenge05.ui.theme.screens.SearchScreen
 
 sealed class Screens(val route: String) {
+    object  SearchScreen: Screens("search_screen")
     object HomeScreen : Screens("home_screen")
     object DetailScreen : Screens("detail_screen/{movie_id}") {
         fun createRoute(movie_id: Int): String {
@@ -57,6 +53,12 @@ fun navigation(networkObserver: NetworkObserver) {
             }
         }
 
+        //  search composable
+        composable(route = Screens.SearchScreen.route) {
+            val moviesViewModel: MoviesViewModel = hiltViewModel()
+            SearchScreen(navController, moviesViewModel, networkObserver)
+
+        }
 
     }
 }

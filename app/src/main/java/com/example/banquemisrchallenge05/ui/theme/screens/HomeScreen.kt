@@ -68,24 +68,31 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.banquemisrchallenge05.NOW_PLAYING
-import com.example.banquemisrchallenge05.POPULAR
-import com.example.banquemisrchallenge05.UPCOMING
-import com.example.banquemisrchallenge05.model.apistates.MovieApiState
 import com.example.banquemisrchallenge05.model.pojos.Movie
 import com.example.banquemisrchallenge05.viewmodels.MoviesViewModel
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.*
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.Navigation
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -107,7 +114,9 @@ fun HomeScreen(
         Log.d("HomeScreen", "movies: ${movies.itemCount}")
         Scaffold(
             containerColor = Color.White,
+
         ) { innerPadding ->
+
             HomeContent(
                 movies = movies,
                 moviesViewModel,
@@ -133,12 +142,7 @@ fun HomeContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Black.copy(alpha = 0.7f),
-                        Color.Black.copy(alpha = 0.9f)
-                    )
-                )
+              gradientColors
             )
     )
     {
@@ -148,6 +152,8 @@ fun HomeContent(
                 .fillMaxSize()
 
         ) {
+            // the search bar and  titel
+            MovieTopBar("Movies challenge ", navController)
             MovieChips(moviesViewModel)
             Spacer(modifier = Modifier.height(30.dp))
             MovieList(movies, navController)
@@ -171,21 +177,25 @@ fun MovieChips(moviesViewModel: MoviesViewModel) {
 
     var selectedType by remember { mutableStateOf(MovieType.NOW_PLAYING) }
 
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(16.dp) // Adjust the padding for the text inside the box
-    ) {
-        Text(
-            text = "Categories",
-            fontWeight = FontWeight.Bold,
-            fontSize = 25.sp,
-            style = MaterialTheme.typography.titleLarge,
-            color = Color.Black // Optional: adjust text color for better visibility
-        )
-    }
+    /*    Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(16.dp) // Adjust the padding for the text inside the box
+        ) {
+            Text(
+                text = "Categories",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black // Optional: adjust text color for better visibility
+            )
+
+            // Search Bar
+
+
+        }*/
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -537,3 +547,58 @@ fun ErrorScreen(message: String, onRetry: () -> Unit) {
 
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovieTopBar(title: String, controller: NavController) {
+    CenterAlignedTopAppBar(
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 10.dp)
+            .wrapContentHeight()// Increased height for balance
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .clip(RoundedCornerShape(35.dp))
+            .shadow(8.dp, RoundedCornerShape(20.dp)),
+
+        title = {
+            Text(
+                title,
+                color = Color.Black,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp),
+                textAlign = TextAlign.Center
+            )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = {controller.navigate(Screens.SearchScreen.route)},
+                modifier = Modifier.padding(10.dp)
+
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(36.dp) // Larger icon
+
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White
+        ),
+    )
+}
+
+
+// gRadiant color
+
+val gradientColors =  Brush.verticalGradient(
+    colors = listOf(
+        Color.Black.copy(alpha = 0.7f),
+        Color.Black.copy(alpha = 0.9f)
+    )
+)
